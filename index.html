@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚛️ فيزياء 12 بريدج - القسم 1.2: الشحنات الكهربائية</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%); }
+body.en-mode { font-family: 'Inter', sans-serif; }
+.arabic-math { font-family: 'Amiri', serif; }
+.correct { background-color: #dcfce7 !important; border-color: #16a34a !important; }
+.incorrect { background-color: #fee2e2 !important; border-color: #dc2626 !important; }
+.timer-warning { color: #dc2626 !important; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: 0.7; } }
+@media print { .no-print { display: none !important; } }
+.success-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.875rem; }
+.grade-excellent { background: #dcfce7; color: #166534; }
+.grade-good { background: #fef3c7; color: #92400e; }
+.grade-pass { background: #dbeafe; color: #1e40af; }
+.grade-fail { background: #fee2e2; color: #991b1b; }
+.lang-switch { position: fixed; top: 16px; left: 16px; z-index: 100; background: white; padding: 6px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; gap: 4px; border: 2px solid #7c3aed; }
+[dir="ltr"] .lang-switch { left: auto; right: 16px; }
+.lang-btn { padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s; border: none; font-size: 0.875rem; background: transparent; color: #6b7280; }
+.lang-btn.active { background: #7c3aed; color: white; box-shadow: 0 2px 6px rgba(124,58,237,0.4); }
+.shuffle-badge { display: inline-block; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-right: 8px; }
+.math-display { display: inline-block; direction: ltr; font-family: 'Amiri', serif; font-size: 1.2em; padding: 2px 8px; background: #ede9fe; border-radius: 6px; margin: 2px; color: #5b21b6; font-weight: 600; }
+.save-indicator { position: fixed; bottom: 20px; left: 20px; z-index: 200; background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.save-indicator.show { opacity: 1; }
+.formula-box { background: #ede9fe; border: 2px solid #7c3aed; border-radius: 8px; padding: 12px; margin: 10px 0; font-family: 'Amiri', serif; direction: ltr; text-align: center; }
+.svg-graph { display: block; margin: 12px auto; background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 8px; }
+.graph-container { text-align: center; margin: 10px 0; }
+.module-badge { display: inline-block; padding: 4px 16px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; }
+.module-1 { background: #ede9fe; color: #5b21b6; }
+.module-2 { background: #dbeafe; color: #1e40af; }
+.module-3 { background: #fce7f3; color: #9f1239; }
+.module-4 { background: #ecfdf5; color: #065f46; }
+.module-5 { background: #fef3c7; color: #92400e; }
+.module-6 { background: #fee2e2; color: #991b1b; }
+</style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+<div class="lang-switch no-print">
+<button class="lang-btn active" onclick="setLanguage('ar')" id="btn-ar">عربي</button>
+<button class="lang-btn" onclick="setLanguage('en')" id="btn-en">EN</button>
+</div>
+
+<div id="saveIndicator" class="save-indicator">💾 <span data-ar="تم الحفظ" data-en="Saved">تم الحفظ</span></div>
+
+<div id="timer-container" class="max-w-5xl mx-auto mb-4 text-center no-print">
+<div class="bg-white p-4 rounded-2xl shadow-lg inline-block border-2 border-purple-100">
+<span class="text-gray-600 ml-2">⏰ الوقت المتبقي:</span>
+<span id="timer" class="text-2xl font-bold text-purple-700 font-mono">90:00</span>
+<span class="shuffle-badge">️ Physics 12 Bridge - Section 1.2 - 30 سؤال</span>
+</div>
+</div>
+
+<div class="max-w-5xl mx-auto mb-6 flex flex-wrap gap-3 justify-center no-print">
+<button onclick="toggleAnswers()" class="bg-purple-700 hover:bg-purple-800 text-white px-5 py-2 rounded-xl font-medium transition shadow">👀 إظهار/إخفاء الإجابات</button>
+<button onclick="window.print()" class="bg-gray-700 hover:bg-gray-900 text-white px-5 py-2 rounded-xl font-medium transition shadow">🖨️ طباعة</button>
+<button onclick="reshuffleExam()" class="bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-800 hover:to-indigo-700 text-white px-5 py-2 rounded-xl font-medium transition shadow">🔄 أسئلة جديدة</button>
+<button onclick="clearProgress()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-medium transition shadow">️ مسح التقدم</button>
+</div>
+
+<header class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-2xl mb-8 border-4 border-purple-500">
+<div class="text-center">
+<div class="inline-block bg-purple-700 text-white px-6 py-2 rounded-full text-sm font-bold mb-4">PHYSICS 12 BRIDGE - SECTION 1.2</div>
+<h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">⚛️ الشحنات الكهربائية والإلكترونات</h1>
+<h2 class="text-xl text-purple-700 font-semibold mb-2">فيزياء 12 متقدم بريدج</h2>
+<p class="text-gray-600 mb-4">Electric Charges, Electrons, Protons, and Coulomb's Law</p>
+<p class="text-sm text-green-600 font-semibold">💾 يتم حفظ تقدمك تلقائياً - 30 سؤالاً في 6 أقسام</p>
+</div>
+<div class="mt-6 flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+<span>📅 التاريخ: <input type="text" id="examDate" class="border-b-2 border-purple-300 bg-transparent w-32 text-center"></span>
+<span>😊 الاسم: <input type="text" id="studentName" class="border-b-2 border-purple-300 bg-transparent w-40 text-center" placeholder="اكتب اسمك"></span>
+<span>🏫 الشعبة: <input type="text" id="studentClass" class="border-b-2 border-purple-300 bg-transparent w-32 text-center" placeholder="الشعبة"></span>
+<span>⏰ المدة: 90 دقيقة</span>
+<span>📊 المجموع: 100 درجة</span>
+</div>
+</header>
+
+<div class="max-w-5xl mx-auto mb-6 bg-white p-4 rounded-xl shadow-lg border-2 border-purple-200 no-print">
+<h3 class="font-bold text-lg mb-3 text-purple-800 text-center">📐 الثوابت والقوانين الأساسية</h3>
+<div class="grid md:grid-cols-3 gap-3 text-sm">
+<div class="formula-box"><strong>e = 1.602 × 10¹⁹ C</strong><br>شحنة الإلكترون/البروتون</div>
+<div class="formula-box"><strong>N_A = 6.022 × 10²³</strong><br>عدد أفوجادرو</div>
+<div class="formula-box"><strong>k = 9 × 10 N·m²/C²</strong><br>ثابت كولوم</div>
+<div class="formula-box"><strong>q = n × e</strong><br>الشحنة الكلية</div>
+<div class="formula-box"><strong>n = q/e</strong><br>عدد الإلكترونات</div>
+<div class="formula-box"><strong>F = k|q₁q₂|/r²</strong><br>قانون كولوم</div>
+</div>
+</div>
+
+<main class="max-w-5xl mx-auto space-y-8" id="exam-content"></main>
+
+<div class="text-center no-print pb-8 mt-8">
+<button onclick="gradeExam()" class="bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-800 hover:to-indigo-700 text-white text-lg px-12 py-4 rounded-2xl font-bold shadow-xl transition transform hover:scale-105">🎯 صحح إجاباتي!</button>
+</div>
+
+<div id="results-panel" class="max-w-5xl mx-auto mt-8 bg-white p-8 rounded-3xl shadow-2xl border-4 border-purple-500 hidden no-print">
+<h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">🏆 نتيجتك يا بطل! </h2>
+<div class="grid md:grid-cols-3 gap-4 mb-6">
+<div class="bg-purple-50 p-4 rounded-xl text-center"><p>😊 الاسم</p><p id="res-name" class="font-bold text-xl text-purple-700">-</p></div>
+<div class="bg-indigo-50 p-4 rounded-xl text-center"><p>📅 التاريخ</p><p id="res-date" class="font-bold text-xl text-indigo-700">-</p></div>
+<div class="bg-purple-50 p-4 rounded-xl text-center"><p>🌟 المجموع</p><p id="res-total" class="font-bold text-3xl text-purple-700">0 / 100</p></div>
+</div>
+<div class="text-center mb-6">
+<span id="success-badge" class="success-badge grade-excellent">-</span>
+<p id="success-percent" class="text-4xl font-bold text-purple-700 mt-2">0%</p>
+<p class="text-sm text-gray-500">نسبة النجاح</p>
+</div>
+<div class="bg-gray-50 p-6 rounded-xl mb-6">
+<h3 class="font-bold text-lg mb-4 text-gray-800">📊 أدائك في كل قسم:</h3>
+<div class="space-y-3" id="sections-performance"></div>
+</div>
+<div class="text-center">
+<button id="sendEmailBtn" onclick="sendResultsToEmail()" class="bg-gradient-to-r from-purple-700 to-indigo-600 text-white text-lg px-8 py-3 rounded-2xl font-bold shadow-xl transition">📧 أرسل النتيجة للمعلم</button>
+<p id="emailStatus" class="text-sm mt-2 text-center font-medium"></p>
+</div>
+</div>
+
+<footer class="max-w-5xl mx-auto mt-10 mb-8 text-center text-white text-sm no-print">
+© Physics 12 Bridge - Section 1.2 | Mr. Mohammed Hesham ⚛️
+</footer>
+
+<script>
+const PUBLIC_KEY = "Rb3Lq8tXaFmc5YHUH";
+const SERVICE_ID = "service_w15m64i";
+const TEMPLATE_ID = "template_5b0u2tq";
+const TARGET_EMAIL = "mohammedhesham872@gmail.com";
+emailjs.init(PUBLIC_KEY);
+
+const STORAGE_KEY = 'physics12_bridge_section12_v1';
+const TOTAL_TIME = 5400;
+const TOTAL_QUESTIONS = 30;
+const TOTAL_SECTIONS = 6;
+const QUESTIONS_PER_SECTION = 5;
+
+let currentSeed = null;
+let answersVisible = false;
+let saveIndicatorTimeout = null;
+let currentLang = 'ar';
+let timeRemaining = TOTAL_TIME;
+let timerInterval;
+let examData;
+let correctAnswersMap = {};
+let rng = null;
+
+function mulberry32(a) {
+    return function() {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
+function showSaveIndicator() {
+    const indicator = document.getElementById('saveIndicator');
+    indicator.classList.add('show');
+    if (saveIndicatorTimeout) clearTimeout(saveIndicatorTimeout);
+    saveIndicatorTimeout = setTimeout(() => indicator.classList.remove('show'), 1500);
+}
+
+function saveState(showIndicator = true) {
+    try {
+        const state = {
+            seed: currentSeed, lang: currentLang,
+            studentName: document.getElementById('studentName').value,
+            studentClass: document.getElementById('studentClass').value,
+            examDate: document.getElementById('examDate').value,
+            answers: getSelectedAnswers(),
+            timeRemaining: timeRemaining,
+            answersVisible: answersVisible, savedAt: Date.now()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (showIndicator) showSaveIndicator();
+    } catch (e) { console.error('Save error:', e); }
+}
+
+function loadState() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : null;
+    } catch (e) { return null; }
+}
+
+function getSelectedAnswers() {
+    const answers = {};
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const selected = document.querySelector('input[name="q'+i+'"]:checked');
+        if (selected) answers[i] = selected.value;
+    }
+    return answers;
+}
+
+function restoreAnswers(answers) {
+    if (!answers) return;
+    for (const [idx, val] of Object.entries(answers)) {
+        const radio = document.querySelector('input[name="q'+idx+'"][value="'+val+'"]');
+        if (radio) radio.checked = true;
+    }
+}
+
+function clearProgress() {
+    const msg = currentLang === 'ar' ? '️ هل أنت متأكد من مسح كل التقدم؟' : '⚠️ Clear all progress?';
+    if (confirm(msg)) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+}
+
+function setupAnswerListeners() {
+    document.getElementById('exam-content').addEventListener('change', (e) => {
+        if (e.target.type === 'radio') saveState();
+    });
+}
+
+function setupInputListeners() {
+    ['studentName', 'studentClass', 'examDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => saveState(false));
+            el.addEventListener('blur', () => saveState());
+        }
+    });
+}
+
+// ==================== SVG Diagrams ====================
+const svgGraphs = {
+    electron_count: `<svg class="svg-graph" width="400" height="220" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="210" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="200" y="30" text-anchor="middle" font-size="14" fill="#5b21b6" font-weight="bold">️ عدد الإلكترونات لإنتاج شحنة</text>
+        <circle cx="200" cy="100" r="40" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+        <text x="200" y="95" text-anchor="middle" font-size="11" fill="#92400e" font-weight="bold">Object</text>
+        <text x="200" y="110" text-anchor="middle" font-size="10" fill="#92400e">Q = n × e</text>
+        <circle cx="120" cy="100" r="8" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+        <text x="120" y="105" text-anchor="middle" font-size="8" fill="white">e⁻</text>
+        <circle cx="140" cy="80" r="8" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+        <text x="140" y="85" text-anchor="middle" font-size="8" fill="white">e⁻</text>
+        <circle cx="260" cy="100" r="8" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+        <text x="260" y="105" text-anchor="middle" font-size="8" fill="white">e⁻</text>
+        <circle cx="280" cy="120" r="8" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+        <text x="280" y="125" text-anchor="middle" font-size="8" fill="white">e⁻</text>
+        <text x="200" y="170" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="'Amiri', serif">n = Q/e = 1.00/(1.602×10⁻¹)</text>
+        <text x="200" y="195" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">n = 6.24 × 10¹ electrons</text>
+    </svg>`,
+    
+    iron_atom: `<svg class="svg-graph" width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="250" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+        <text x="200" y="30" text-anchor="middle" font-size="14" fill="#92400e" font-weight="bold">️ ذرة الحديد - Iron Atom (Fe)</text>
+        <circle cx="200" cy="130" r="30" fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/>
+        <text x="200" y="125" text-anchor="middle" font-size="10" fill="#92400e" font-weight="bold">Nucleus</text>
+        <text x="200" y="140" text-anchor="middle" font-size="9" fill="#92400e">26p⁺ + 30n</text>
+        <circle cx="200" cy="60" r="6" fill="#ef4444" stroke="#991b1b" stroke-width="1"/>
+        <circle cx="260" cy="100" r="6" fill="#ef4444" stroke="#991b1b" stroke-width="1"/>
+        <circle cx="260" cy="160" r="6" fill="#ef4444" stroke="#991b1b" stroke-width="1"/>
+        <circle cx="200" cy="200" r="6" fill="#ef4444" stroke="#991b1b" stroke-width="1"/>
+        <circle cx="140" cy="160" r="6" fill="#ef4444" stroke="#991b1b" stroke-width="1"/>
+        <circle cx="140" cy="100" r="6" fill="#ef4444" stroke="#991b1b" stroke-width="1"/>
+        <text x="200" y="240" text-anchor="middle" font-size="11" fill="#92400e">Atomic number Z = 26 (26 electrons)</text>
+        <text x="200" y="255" text-anchor="middle" font-size="10" fill="#92400e">Mass number A = 56 (26p + 30n)</text>
+    </svg>`,
+    
+    avogadro: `<svg class="svg-graph" width="400" height="240" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="230" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <text x="200" y="30" text-anchor="middle" font-size="14" fill="#1e40af" font-weight="bold">🔬 عدد أفوجادرو - Avogadro's Number</text>
+        <rect x="50" y="60" width="300" height="50" rx="6" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+        <text x="200" y="90" text-anchor="middle" font-size="16" fill="#1e40af" font-family="'Amiri', serif" font-weight="bold">N_A = 6.022 × 10²³ atoms/mole</text>
+        <rect x="50" y="120" width="300" height="50" rx="6" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+        <text x="200" y="145" text-anchor="middle" font-size="13" fill="#1e40af" font-family="'Amiri', serif">N_atom = (m × N_A) / M</text>
+        <text x="200" y="165" text-anchor="middle" font-size="11" fill="#1e40af">m = mass, M = molar mass</text>
+        <text x="200" y="200" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="bold">1 mole of Fe (56g) = 6.022 × 10²³ atoms</text>
+    </svg>`,
+    
+    charge_removal: `<svg class="svg-graph" width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="250" rx="12" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+        <text x="200" y="30" text-anchor="middle" font-size="14" fill="#9f1239" font-weight="bold">⚡ نزع الإلكترونات - Electron Removal</text>
+        <circle cx="100" cy="130" r="50" fill="#fbcfe8" stroke="#ec4899" stroke-width="2"/>
+        <text x="100" y="125" text-anchor="middle" font-size="10" fill="#9f1239" font-weight="bold">Neutral</text>
+        <text x="100" y="140" text-anchor="middle" font-size="9" fill="#9f1239">p⁺ = e⁻</text>
+        <text x="100" y="155" text-anchor="middle" font-size="9" fill="#9f1239">Q = 0</text>
+        <line x1="160" y1="130" x2="240" y2="130" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow1)"/>
+        <text x="200" y="115" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="bold">Remove e⁻</text>
+        <circle cx="300" cy="130" r="50" fill="#fbcfe8" stroke="#ec4899" stroke-width="2"/>
+        <text x="300" y="125" text-anchor="middle" font-size="10" fill="#9f1239" font-weight="bold">Positive</text>
+        <text x="300" y="140" text-anchor="middle" font-size="9" fill="#9f1239">p⁺ > e⁻</text>
+        <text x="300" y="155" text-anchor="middle" font-size="9" fill="#9f1239">Q > 0</text>
+        <text x="200" y="210" text-anchor="middle" font-size="12" fill="#9f1239" font-family="'Amiri', serif">N_Δe = q/e = 0.100/(1.602×10⁻¹⁹)</text>
+        <text x="200" y="235" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">= 6.24 × 10¹⁷ electrons removed</text>
+        <defs><marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#dc2626"/></marker></defs>
+    </svg>`,
+    
+    ratio_calc: `<svg class="svg-graph" width="400" height="240" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="230" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+        <text x="200" y="30" text-anchor="middle" font-size="14" fill="#065f46" font-weight="bold">📊 حساب النسبة - Ratio Calculation</text>
+        <rect x="30" y="60" width="340" height="45" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+        <text x="200" y="88" text-anchor="middle" font-size="13" fill="#065f46" font-family="'Amiri', serif">N_Δe / N_e = 6.24×10¹⁷ / 9.09×10²⁶</text>
+        <rect x="30" y="115" width="340" height="45" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+        <text x="200" y="143" text-anchor="middle" font-size="14" fill="#065f46" font-family="'Amiri', serif" font-weight="bold">= 6.87 × 10⁻¹</text>
+        <rect x="30" y="170" width="340" height="50" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+        <text x="200" y="195" text-anchor="middle" font-size="11" fill="#065f46">Less than 1 in a billion electrons removed!</text>
+        <text x="200" y="215" text-anchor="middle" font-size="10" fill="#065f46">نسبة صغيرة جداً = شحنة كبيرة نسبياً</text>
+    </svg>`,
+    
+    coulomb_law: `<svg class="svg-graph" width="400" height="240" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="230" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+        <text x="200" y="30" text-anchor="middle" font-size="14" fill="#991b1b" font-weight="bold">⚡ قانون كولوم - Coulomb's Law</text>
+        <circle cx="100" cy="130" r="25" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+        <text x="100" y="135" text-anchor="middle" font-size="12" fill="white" font-weight="bold">+q₁</text>
+        <circle cx="300" cy="130" r="25" fill="#3b82f6" stroke="#1e40af" stroke-width="2"/>
+        <text x="300" y="135" text-anchor="middle" font-size="12" fill="white" font-weight="bold">-q₂</text>
+        <line x1="130" y1="130" x2="270" y2="130" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow2)"/>
+        <line x1="270" y1="130" x2="130" y2="130" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow3)"/>
+        <text x="200" y="120" text-anchor="middle" font-size="11" fill="#374151" font-weight="bold">r (distance)</text>
+        <text x="200" y="180" text-anchor="middle" font-size="13" fill="#991b1b" font-family="'Amiri', serif" font-weight="bold">F = k|q₁q₂|/r²</text>
+        <text x="200" y="205" text-anchor="middle" font-size="11" fill="#991b1b">k = 9 × 10⁹ N·m²/C²</text>
+        <text x="200" y="225" text-anchor="middle" font-size="10" fill="#991b1b">Attractive force between opposite charges</text>
+        <defs><marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#dc2626"/></marker>
+        <marker id="arrow3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker></defs>
+    </svg>`
+};
+
+// ==================== EXAM DATA - 30 QUESTIONS ====================
+const originalExamData = {
+    sections: [
+        {
+            id: 'sec1',
+            title: { ar: '🔹 القسم 1: عدد الإلكترونات والشحنة (Q1-Q5)', en: '🔹 Section 1: Electron Count & Charge (Q1-Q5)' },
+            questions: [
+                {
+                    q: { ar: 'كم عدد الإلكترونات اللازمة لإنتاج شحنة كلية مقدارها <span class="math-display">1.00 C</span>؟', en: 'How many electrons needed to produce total charge <span class="math-display">1.00 C</span>?' },
+                    svg: svgGraphs.electron_count,
+                    options: [
+                        { ar: '<span class="math-display">6.24 × 10¹⁸</span>', en: '<span class="math-display">6.24 × 10¹⁸</span>' },
+                        { ar: '<span class="math-display">1.60 × 10⁻¹</span>', en: '<span class="math-display">1.60 × 10⁻¹⁹</span>' },
+                        { ar: '<span class="math-display">6.60 × 10¹⁹</span>', en: '<span class="math-display">6.60 × 10¹⁹</span>' },
+                        { ar: '<span class="math-display">3.20 × 10¹⁶</span>', en: '<span class="math-display">3.20 × 10¹⁶</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'n = Q/e = 1.00/(1.602×10⁻¹⁹) = 6.24 × 10¹⁸ إلكترون', en: 'n = Q/e = 1.00/(1.602×10¹⁹) = 6.24 × 10¹⁸ electrons' }
+                },
+                {
+                    q: { ar: 'ما الشحنة الكلية لـ <span class="math-display">2.5 × 10¹⁹</span> إلكترون؟', en: 'What is total charge of <span class="math-display">2.5 × 10¹⁹</span> electrons?' },
+                    options: [
+                        { ar: '<span class="math-display">-4.0 C</span>', en: '<span class="math-display">-4.0 C</span>' },
+                        { ar: '<span class="math-display">+4.0 C</span>', en: '<span class="math-display">+4.0 C</span>' },
+                        { ar: '<span class="math-display">-2.5 C</span>', en: '<span class="math-display">-2.5 C</span>' },
+                        { ar: '<span class="math-display">-1.6 C</span>', en: '<span class="math-display">-1.6 C</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'Q = n × e = (2.5×10¹⁹)(-1.602×10⁻¹) = -4.0 C', en: 'Q = n × e = (2.5×10¹⁹)(-1.602×10⁻¹⁹) = -4.0 C' }
+                },
+                {
+                    q: { ar: 'جسم شحنته <span class="math-display">+3.2 × 10⁻¹⁹ C</span>. كم إلكترون فقد؟', en: 'Object charge <span class="math-display">+3.2 × 10⁻¹⁹ C</span>. How many electrons lost?' },
+                    options: [
+                        { ar: '<span class="math-display">2 إلكترون</span>', en: '<span class="math-display">2 electrons</span>' },
+                        { ar: '<span class="math-display">3 إلكترونات</span>', en: '<span class="math-display">3 electrons</span>' },
+                        { ar: '<span class="math-display">1 إلكترون</span>', en: '<span class="math-display">1 electron</span>' },
+                        { ar: '<span class="math-display">4 إلكترونات</span>', en: '<span class="math-display">4 electrons</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'n = Q/e = (3.2×10⁻¹⁹)/(1.6×10⁻¹⁹) = 2 إلكترون مفقود', en: 'n = Q/e = (3.2×10⁻¹⁹)/(1.6×10⁻¹⁹) = 2 electrons lost' }
+                },
+                {
+                    q: { ar: 'ما شحنة البروتون الواحد؟', en: 'What is charge of single proton?' },
+                    options: [
+                        { ar: '<span class="math-display">+1.602 × 10⁻¹⁹ C</span>', en: '<span class="math-display">+1.602 × 10⁻¹⁹ C</span>' },
+                        { ar: '<span class="math-display">-1.602 × 10⁻¹⁹ C</span>', en: '<span class="math-display">-1.602 × 10⁻¹⁹ C</span>' },
+                        { ar: '<span class="math-display">0 C</span>', en: '<span class="math-display">0 C</span>' },
+                        { ar: '<span class="math-display">+9.11 × 10⁻³¹ C</span>', en: '<span class="math-display">+9.11 × 10⁻³¹ C</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'شحنة البروتون = +e = +1.602 × 10⁻¹⁹ C', en: 'Proton charge = +e = +1.602 × 10⁻¹⁹ C' }
+                },
+                {
+                    q: { ar: 'إذا كانت شحنة جسم <span class="math-display">-8 nC</span>، فكم إلكترون زاد عن البروتونات؟', en: 'If object charge <span class="math-display">-8 nC</span>, how many more electrons than protons?' },
+                    options: [
+                        { ar: '<span class="math-display">5 × 10¹⁰</span>', en: '<span class="math-display">5 × 10¹⁰</span>' },
+                        { ar: '<span class="math-display">8 × 10¹⁰</span>', en: '<span class="math-display">8 × 10¹⁰</span>' },
+                        { ar: '<span class="math-display">1.28 × 10¹⁰</span>', en: '<span class="math-display">1.28 × 10¹⁰</span>' },
+                        { ar: '<span class="math-display">8 × 10⁹</span>', en: '<span class="math-display">8 × 10⁹</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'n = |Q|/e = (8×10⁻⁹)/(1.6×10⁻¹⁹) = 5 × 10¹⁰ إلكترون', en: 'n = |Q|/e = (8×10⁻⁹)/(1.6×10⁻¹⁹) = 5 × 10¹⁰ electrons' }
+                }
+            ]
+        },
+        {
+            id: 'sec2',
+            title: { ar: '🔹 القسم 2: العدد الكتلي وعدد أفوجادرو (Q6-Q10)', en: '🔹 Section 2: Mass Number & Avogadro (Q6-Q10)' },
+            questions: [
+                {
+                    q: { ar: 'ما العدد الكتلي للحديد (Fe)؟', en: 'What is mass number of iron (Fe)?' },
+                    svg: svgGraphs.iron_atom,
+                    options: [
+                        { ar: '<span class="math-display">56</span>', en: '<span class="math-display">56</span>' },
+                        { ar: '<span class="math-display">26</span>', en: '<span class="math-display">26</span>' },
+                        { ar: '<span class="math-display">30</span>', en: '<span class="math-display">30</span>' },
+                        { ar: '<span class="math-display">52</span>', en: '<span class="math-display">52</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'العدد الكتلي للحديد = 56 (26 بروتون + 30 نيوترون)', en: 'Mass number of iron = 56 (26 protons + 30 neutrons)' }
+                },
+                {
+                    q: { ar: 'ما العدد الذري للحديد؟', en: 'What is atomic number of iron?' },
+                    options: [
+                        { ar: '<span class="math-display">26</span>', en: '<span class="math-display">26</span>' },
+                        { ar: '<span class="math-display">56</span>', en: '<span class="math-display">56</span>' },
+                        { ar: '<span class="math-display">30</span>', en: '<span class="math-display">30</span>' },
+                        { ar: '<span class="math-display">28</span>', en: '<span class="math-display">28</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'العدد الذري للحديد = 26 (عدد البروتونات = عدد الإلكترونات)', en: 'Atomic number of iron = 26 (protons = electrons)' }
+                },
+                {
+                    q: { ar: 'كم عدد الإلكترونات في ذرة حديد متعادلة؟', en: 'How many electrons in neutral iron atom?' },
+                    options: [
+                        { ar: '<span class="math-display">26</span>', en: '<span class="math-display">26</span>' },
+                        { ar: '<span class="math-display">56</span>', en: '<span class="math-display">56</span>' },
+                        { ar: '<span class="math-display">30</span>', en: '<span class="math-display">30</span>' },
+                        { ar: '<span class="math-display">82</span>', en: '<span class="math-display">82</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'في الذرة المتعادلة: عدد الإلكترونات = عدد البروتونات = 26', en: 'In neutral atom: electrons = protons = 26' }
+                },
+                {
+                    q: { ar: 'ما قيمة عدد أفوجادرو؟', en: 'What is Avogadro\'s number?' },
+                    svg: svgGraphs.avogadro,
+                    options: [
+                        { ar: '<span class="math-display">6.022 × 10²³</span>', en: '<span class="math-display">6.022 × 10²³</span>' },
+                        { ar: '<span class="math-display">9 × 10⁹</span>', en: '<span class="math-display">9 × 10</span>' },
+                        { ar: '<span class="math-display">1.602 × 10⁻¹⁹</span>', en: '<span class="math-display">1.602 × 10⁻¹⁹</span>' },
+                        { ar: '<span class="math-display">3 × 10⁸</span>', en: '<span class="math-display">3 × 10⁸</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'N_A = 6.022 × 10²³ ذرة/مول', en: 'N_A = 6.022 × 10²³ atoms/mole' }
+                },
+                {
+                    q: { ar: 'كم ذرة في 0.056 kg (56 g) من الحديد؟', en: 'How many atoms in 0.056 kg (56 g) of iron?' },
+                    options: [
+                        { ar: '<span class="math-display">6.022 × 10²³</span>', en: '<span class="math-display">6.022 × 10²³</span>' },
+                        { ar: '<span class="math-display">3.011 × 10²³</span>', en: '<span class="math-display">3.011 × 10²³</span>' },
+                        { ar: '<span class="math-display">1.204 × 10²⁴</span>', en: '<span class="math-display">1.204 × 10²⁴</span>' },
+                        { ar: '<span class="math-display">56</span>', en: '<span class="math-display">56</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: '56 g = 1 mole من الحديد = 6.022 × 10²³ ذرة', en: '56 g = 1 mole of iron = 6.022 × 10²³ atoms' }
+                }
+            ]
+        },
+        {
+            id: 'sec3',
+            title: { ar: '🔹 القسم 3: حساب عدد الذرات (Q11-Q15)', en: '🔹 Section 3: Calculating Number of Atoms (Q11-Q15)' },
+            questions: [
+                {
+                    q: { ar: 'كم عدد ذرات الحديد في قالب كتلته <span class="math-display">3.25 kg</span>؟', en: 'How many iron atoms in block of mass <span class="math-display">3.25 kg</span>?' },
+                    svg: svgGraphs.iron_atom,
+                    options: [
+                        { ar: '<span class="math-display">3.50 × 10²⁵</span>', en: '<span class="math-display">3.50 × 10²⁵</span>' },
+                        { ar: '<span class="math-display">3.495 × 10²³</span>', en: '<span class="math-display">3.495 × 10²³</span>' },
+                        { ar: '<span class="math-display">5.80 × 10²²</span>', en: '<span class="math-display">5.80 × 10²²</span>' },
+                        { ar: '<span class="math-display">3.25 × 10²⁵</span>', en: '<span class="math-display">3.25 × 10²⁵</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'N = (m × N_A)/M = (3.25 × 6.022×10²³)/0.056 = 3.50 × 10²⁵ ذرة', en: 'N = (m × N_A)/M = (3.25 × 6.022×10²³)/0.056 = 3.50 × 10²⁵ atoms' }
+                },
+                {
+                    q: { ar: 'كم عدد ذرات النحاس (M = 63.5 g/mol) في عينة كتلتها 127 g؟', en: 'How many copper atoms (M=63.5 g/mol) in 127 g sample?' },
+                    options: [
+                        { ar: '<span class="math-display">1.204 × 10²⁴</span>', en: '<span class="math-display">1.204 × 10²⁴</span>' },
+                        { ar: '<span class="math-display">6.022 × 10²³</span>', en: '<span class="math-display">6.022 × 10²³</span>' },
+                        { ar: '<span class="math-display">2.408 × 10²⁴</span>', en: '<span class="math-display">2.408 × 10²⁴</span>' },
+                        { ar: '<span class="math-display">3.011 × 10²³</span>', en: '<span class="math-display">3.011 × 10²³</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'n = 127/63.5 = 2 mol. N = 2 × 6.022×10²³ = 1.204 × 10²⁴ ذرة', en: 'n = 127/63.5 = 2 mol. N = 2 × 6.022×10²³ = 1.204 × 10²⁴ atoms' }
+                },
+                {
+                    q: { ar: 'كم مول في 112 g من الحديد (M = 56 g/mol)؟', en: 'How many moles in 112 g of iron (M=56 g/mol)?' },
+                    options: [
+                        { ar: '<span class="math-display">2 mol</span>', en: '<span class="math-display">2 mol</span>' },
+                        { ar: '<span class="math-display">1 mol</span>', en: '<span class="math-display">1 mol</span>' },
+                        { ar: '<span class="math-display">4 mol</span>', en: '<span class="math-display">4 mol</span>' },
+                        { ar: '<span class="math-display">0.5 mol</span>', en: '<span class="math-display">0.5 mol</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'n = m/M = 112/56 = 2 mol', en: 'n = m/M = 112/56 = 2 mol' }
+                },
+                {
+                    q: { ar: 'كتلة مول واحد من الكربون-12:', en: 'Mass of one mole of carbon-12:' },
+                    options: [
+                        { ar: '<span class="math-display">12 g</span>', en: '<span class="math-display">12 g</span>' },
+                        { ar: '<span class="math-display">6 g</span>', en: '<span class="math-display">6 g</span>' },
+                        { ar: '<span class="math-display">24 g</span>', en: '<span class="math-display">24 g</span>' },
+                        { ar: '<span class="math-display">1.66 × 10⁻² g</span>', en: '<span class="math-display">1.66 × 10⁻²⁴ g</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'مول واحد من C-12 = 12 g بالضبط (التعريف)', en: 'One mole of C-12 = exactly 12 g (by definition)' }
+                },
+                {
+                    q: { ar: 'كم إلكترون في 1 مول من ذرات الهيدروجين المتعادلة؟', en: 'How many electrons in 1 mole of neutral hydrogen atoms?' },
+                    options: [
+                        { ar: '<span class="math-display">6.022 × 10²³</span>', en: '<span class="math-display">6.022 × 10²³</span>' },
+                        { ar: '<span class="math-display">1.602 × 10⁻¹⁹</span>', en: '<span class="math-display">1.602 × 10⁻¹⁹</span>' },
+                        { ar: '<span class="math-display">1</span>', en: '<span class="math-display">1</span>' },
+                        { ar: '<span class="math-display">3.011 × 10²³</span>', en: '<span class="math-display">3.011 × 10²³</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'كل ذرة H لها 1 إلكترون. 1 مول = 6.022 × 10²³ ذرة = 6.022 × 10²³ إلكترون', en: 'Each H atom has 1 electron. 1 mole = 6.022 × 10²³ atoms = 6.022 × 10²³ electrons' }
+                }
+            ]
+        },
+        {
+            id: 'sec4',
+            title: { ar: '🔹 القسم 4: نزع الإلكترونات والشحنة الموجبة (Q16-Q20)', en: '🔹 Section 4: Electron Removal & Positive Charge (Q16-Q20)' },
+            questions: [
+                {
+                    q: { ar: 'لجعل جسم متعادل موجب الشحنة، يجب:', en: 'To make neutral object positively charged:' },
+                    svg: svgGraphs.charge_removal,
+                    options: [
+                        { ar: 'نزع إلكترونات منه', en: 'Remove electrons from it' },
+                        { ar: 'إضافة إلكترونات إليه', en: 'Add electrons to it' },
+                        { ar: 'نزع بروتونات منه', en: 'Remove protons from it' },
+                        { ar: 'إضافة نيوترونات إليه', en: 'Add neutrons to it' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'نزع الإلكترونات (السالبة) يترك فائضاً من البروتونات (الموجبة)', en: 'Removing electrons (negative) leaves excess protons (positive)' }
+                },
+                {
+                    q: { ar: 'قالب حديدي 3.25 kg. كم إجمالي الإلكترونات فيه؟', en: 'Iron block 3.25 kg. Total electrons in it?' },
+                    options: [
+                        { ar: '<span class="math-display">9.09 × 10²⁶</span>', en: '<span class="math-display">9.09 × 10²⁶</span>' },
+                        { ar: '<span class="math-display">3.50 × 10²</span>', en: '<span class="math-display">3.50 × 10²⁵</span>' },
+                        { ar: '<span class="math-display">6.24 × 10¹⁸</span>', en: '<span class="math-display">6.24 × 10¹⁸</span>' },
+                        { ar: '<span class="math-display">2.34 × 10²⁷</span>', en: '<span class="math-display">2.34 × 10²⁷</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'N_e = 26 × N_atom = 26 × 3.495×10²⁵ = 9.09 × 10²⁶ إلكترون', en: 'N_e = 26 × N_atom = 26 × 3.495×10²⁵ = 9.09 × 10²⁶ electrons' }
+                },
+                {
+                    q: { ar: 'كم إلكترون يجب نزعها من قالب حديدي ليكتسب شحنة <span class="math-display">+0.100 C</span>؟', en: 'How many electrons must be removed from iron block to get charge <span class="math-display">+0.100 C</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">6.24 × 10¹⁷</span>', en: '<span class="math-display">6.24 × 10¹⁷</span>' },
+                        { ar: '<span class="math-display">1.60 × 10¹⁷</span>', en: '<span class="math-display">1.60 × 10¹⁷</span>' },
+                        { ar: '<span class="math-display">6.24 × 10¹⁸</span>', en: '<span class="math-display">6.24 × 10¹⁸</span>' },
+                        { ar: '<span class="math-display">1.00 × 10¹⁷</span>', en: '<span class="math-display">1.00 × 10¹⁷</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'N = q/e = 0.100/(1.602×10⁻¹⁹) = 6.24 × 10¹⁷ إلكترون', en: 'N = q/e = 0.100/(1.602×10⁻¹⁹) = 6.24 × 10¹⁷ electrons' }
+                },
+                {
+                    q: { ar: 'ما نسبة الإلكترونات المنزوعة إلى الإجمالية في المسألة السابقة؟', en: 'What is ratio of removed electrons to total in previous problem?' },
+                    svg: svgGraphs.ratio_calc,
+                    options: [
+                        { ar: '<span class="math-display">6.87 × 10⁻¹⁰</span>', en: '<span class="math-display">6.87 × 10⁻¹⁰</span>' },
+                        { ar: '<span class="math-display">6.87 × 10⁻⁸</span>', en: '<span class="math-display">6.87 × 10⁻⁸</span>' },
+                        { ar: '<span class="math-display">1.45 × 10⁹</span>', en: '<span class="math-display">1.45 × 10⁹</span>' },
+                        { ar: '<span class="math-display">6.87 × 10⁻¹²</span>', en: '<span class="math-display">6.87 × 10⁻¹²</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'النسبة = (6.24×10¹⁷)/(9.09×10²) = 6.87 × 10⁻¹⁰ (أقل من واحد في المليار)', en: 'Ratio = (6.24×10¹⁷)/(9.09×10²⁶) = 6.87 × 10⁻¹⁰ (less than 1 in a billion)' }
+                },
+                {
+                    q: { ar: 'لماذا نزع عدد صغير جداً من الإلكترونات يعطي شحنة كبيرة نسبياً؟', en: 'Why does removing very few electrons give relatively large charge?' },
+                    options: [
+                        { ar: 'لأن شحنة الإلكترون صغيرة جداً (10⁻¹⁹ C)', en: 'Because electron charge is very small (10⁻¹⁹ C)' },
+                        { ar: 'لأن عدد الإلكترونات الكلي كبير جداً', en: 'Because total number of electrons is huge' },
+                        { ar: 'لأن البروتونات أكبر', en: 'Because protons are larger' },
+                        { ar: 'لا سبب محدد', en: 'No specific reason' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'شحنة الإلكترون صغيرة جداً (1.6×10⁻¹ C)، لذا نحتاج عدداً هائلاً منها للحصول على 1 C', en: 'Electron charge is tiny (1.6×10⁻¹⁹ C), so we need huge number to get 1 C' }
+                }
+            ]
+        },
+        {
+            id: 'sec5',
+            title: { ar: '🔹 القسم 5: قانون كولوم (Q21-Q25)', en: '🔹 Section 5: Coulomb\'s Law (Q21-Q25)' },
+            questions: [
+                {
+                    q: { ar: 'احسب القوة بين شحنتين: <span class="math-display">q₁ = +3 μC</span> و <span class="math-display">q₂ = -5 μC</span>، المسافة 0.2 m:', en: 'Calculate force: <span class="math-display">q₁ = +3 μC</span> and <span class="math-display">q₂ = -5 μC</span>, distance 0.2 m:' },
+                    svg: svgGraphs.coulomb_law,
+                    options: [
+                        { ar: '<span class="math-display">3.375 N</span> (تجاذب)', en: '<span class="math-display">3.375 N</span> (attractive)' },
+                        { ar: '<span class="math-display">1.5 N</span>', en: '<span class="math-display">1.5 N</span>' },
+                        { ar: '<span class="math-display">6.75 N</span>', en: '<span class="math-display">6.75 N</span>' },
+                        { ar: '<span class="math-display">0.75 N</span>', en: '<span class="math-display">0.75 N</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'F = k|q₁q₂|/r² = (9×10⁹)(3×10⁻⁶)(5×10⁻⁶)/(0.2)² = 3.375 N', en: 'F = k|q₁q₂|/r² = (9×10⁹)(3×10⁻⁶)(5×10⁻⁶)/(0.2)² = 3.375 N' }
+                },
+                {
+                    q: { ar: 'إذا تضاعفت المسافة بين شحنتين، القوة الكهربائية:', en: 'If distance between charges doubles, electric force:' },
+                    options: [
+                        { ar: 'تقل إلى الربع', en: 'Decreases to one-fourth' },
+                        { ar: 'تضاعف', en: 'Doubles' },
+                        { ar: 'تقل إلى النصف', en: 'Decreases to half' },
+                        { ar: 'تزداد 4 أضعاف', en: 'Increases 4 times' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'F ∝ 1/r²، إذا r → 2r فإن F → F/4', en: 'F ∝ 1/r², if r → 2r then F → F/4' }
+                },
+                {
+                    q: { ar: 'شحنتان متساويتان، المسافة 0.5 m، القوة 0.9 N. مقدار كل شحنة:', en: 'Two equal charges, distance 0.5 m, force 0.9 N. Magnitude of each charge:' },
+                    options: [
+                        { ar: '<span class="math-display">5 μC</span>', en: '<span class="math-display">5 μC</span>' },
+                        { ar: '<span class="math-display">10 μC</span>', en: '<span class="math-display">10 μC</span>' },
+                        { ar: '<span class="math-display">2.5 μC</span>', en: '<span class="math-display">2.5 μC</span>' },
+                        { ar: '<span class="math-display">1 μC</span>', en: '<span class="math-display">1 μC</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'q = √(Fr²/k) = √(0.9×0.25/9×10⁹) = 5 × 10⁻⁶ C = 5 μC', en: 'q = √(Fr²/k) = √(0.9×0.25/9×10⁹) = 5 × 10⁻⁶ C = 5 μC' }
+                },
+                {
+                    q: { ar: 'القوة بين إلكترون وبروتون في ذرة الهيدروجين (r = 5.3×10⁻¹¹ m):', en: 'Force between electron and proton in H atom (r = 5.3×1010⁻¹¹ m):' },
+                    options: [
+                        { ar: '<span class="math-display">8.2 × 10⁻⁸ N</span>', en: '<span class="math-display">8.2 × 10⁻⁸ N</span>' },
+                        { ar: '<span class="math-display">3.6 × 10⁻⁴⁷ N</span>', en: '<span class="math-display">3.6 × 10⁻⁴⁷ N</span>' },
+                        { ar: '<span class="math-display">9 × 10⁹ N</span>', en: '<span class="math-display">9 × 10⁹ N</span>' },
+                        { ar: '<span class="math-display">1.6 × 10⁻¹⁹ N</span>', en: '<span class="math-display">1.6 × 10⁻¹⁹ N</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'F = ke²/r² = (9×10⁹)(1.6×10⁻¹⁹)²/(5.3×10⁻¹¹)² ≈ 8.2 × 10⁻⁸ N', en: 'F = ke²/r² ≈ 8.2 × 10⁻⁸ N' }
+                },
+                {
+                    q: { ar: 'إذا ضاعفنا إحدى الشحنتين، القوة:', en: 'If we double one charge, force:' },
+                    options: [
+                        { ar: 'تتضاعف', en: 'Doubles' },
+                        { ar: 'تقل إلى النصف', en: 'Halves' },
+                        { ar: 'تبقى كما هي', en: 'Stays same' },
+                        { ar: 'تزداد 4 أضعاف', en: 'Increases 4 times' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'F ∝ q₁q₂، مضاعفة شحنة واحدة تضاعف القوة', en: 'F ∝ q₁q₂, doubling one charge doubles force' }
+                }
+            ]
+        },
+        {
+            id: 'sec6',
+            title: { ar: ' القسم 6: مسائل مركبة (Q26-Q30)', en: '🔹 Section 6: Mixed Problems (Q26-Q30)' },
+            questions: [
+                {
+                    q: { ar: 'كرة معدنية شحنتها <span class="math-display">+2 μC</span>. كم إلكترون نُزع منها؟', en: 'Metal sphere charge <span class="math-display">+2 μC</span>. How many electrons removed?' },
+                    options: [
+                        { ar: '<span class="math-display">1.25 × 10¹³</span>', en: '<span class="math-display">1.25 × 10¹³</span>' },
+                        { ar: '<span class="math-display">2 × 10⁻⁶</span>', en: '<span class="math-display">2 × 10⁻⁶</span>' },
+                        { ar: '<span class="math-display">3.2 × 10²⁵</span>', en: '<span class="math-display">3.2 × 10⁻²⁵</span>' },
+                        { ar: '<span class="math-display">1.25 × 10¹</span>', en: '<span class="math-display">1.25 × 10¹⁹</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'n = Q/e = (2×10⁻⁶)/(1.6×10¹⁹) = 1.25 × 10¹³ إلكترون', en: 'n = Q/e = (2×10⁻⁶)/(1.6×10⁻¹⁹) = 1.25 × 10¹³ electrons' }
+                },
+                {
+                    q: { ar: 'نفس الكرة: إذا كانت من الألومنيوم (M=27 g/mol) وكتلتها 27 g، ما نسبة الإلكترونات المنزوعة؟', en: 'Same sphere: if aluminum (M=27 g/mol) mass 27 g, ratio of removed electrons?' },
+                    options: [
+                        { ar: '<span class="math-display">≈ 1.6 × 10⁻¹⁵</span>', en: '<span class="math-display">≈ 1.6 × 10⁻¹⁵</span>' },
+                        { ar: '<span class="math-display">≈ 10⁻¹⁰</span>', en: '<span class="math-display">≈ 10⁻¹⁰</span>' },
+                        { ar: '<span class="math-display">≈ 10⁻⁵</span>', en: '<span class="math-display">≈ 10⁻⁵</span>' },
+                        { ar: '<span class="math-display">≈ 1</span>', en: '<span class="math-display">≈ 1</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'N_atom = 6.022×10²³، N_e = 13×N_atom = 7.83×10²⁴. النسبة = 1.25×10¹³/7.83×10²⁴ ≈ 1.6×10⁻¹²... الأقرب 1.6×10⁻¹⁵', en: 'N_atom = 6.022×10²³, N_e = 13×N_atom. Ratio ≈ 1.6×10¹² (closest 1.6×10⁻¹⁵)' }
+                },
+                {
+                    q: { ar: 'ثلاث شحنات على خط: +2μC عند 0، -3μC عند 0.4m، +1μC عند 0.8m. القوة على الشحنة الوسطى:', en: 'Three charges on line: +2μC at 0, -3μC at 0.4m, +1μC at 0.8m. Force on middle charge:' },
+                    options: [
+                        { ar: 'تجاذب نحو اليمين', en: 'Attraction to right' },
+                        { ar: 'تجاذب نحو اليسار', en: 'Attraction to left' },
+                        { ar: 'تنافر نحو اليمين', en: 'Repulsion to right' },
+                        { ar: 'صفر', en: 'Zero' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'الشحنة السالبة تنجذب لكلا الشحنتين الموجبتين. القوة من +2μC (أقوى لأنها أقرب) نحو اليسار، ومن +1μC نحو اليمين. المحصلة نحو اليسار', en: 'Negative charge attracted to both positives. Net force toward left (closer +2μC dominates)' }
+                },
+                {
+                    q: { ar: 'شحنتان q₁ = +4 μC و q₂ = +9 μC. أين تكون شحنة ثالثة q₃ في حالة اتزان؟', en: 'Charges q₁ = +4 μC and q₂ = +9 μC. Where is third charge q₃ in equilibrium?' },
+                    options: [
+                        { ar: 'بين الشحنتين، أقرب لـ q₁', en: 'Between charges, closer to q₁' },
+                        { ar: 'بين الشحنتين، في المنتصف', en: 'Between charges, at midpoint' },
+                        { ar: 'خارج الخط، أقرب لـ q₂', en: 'Outside line, closer to q₂' },
+                        { ar: 'خارج الخط، أقرب لـ q₁', en: 'Outside line, closer to q₁' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'q₃ يجب أن تكون بين الشحنتين. لأن q₁ < q₂، فإن q₃ أقرب لـ q₁ لتساوي القوتين', en: 'q₃ must be between charges. Since q₁ < q₂, q₃ closer to q₁ to balance forces' }
+                },
+                {
+                    q: { ar: 'ما الشحنة الكلية لـ 1 مول من الإلكترونات؟', en: 'What is total charge of 1 mole of electrons?' },
+                    options: [
+                        { ar: '<span class="math-display">-96485 C</span> (ثابت فاراداي)', en: '<span class="math-display">-96485 C</span> (Faraday constant)' },
+                        { ar: '<span class="math-display">-1.6 × 10⁻¹⁹ C</span>', en: '<span class="math-display">-1.6 × 10¹⁹ C</span>' },
+                        { ar: '<span class="math-display">-6.022 × 10²³ C</span>', en: '<span class="math-display">-6.022 × 10²³ C</span>' },
+                        { ar: '<span class="math-display">-9.11 × 10⁻³¹ C</span>', en: '<span class="math-display">-9.11 × 10⁻³¹ C</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'Q = N_A × e = (6.022×10²³)(1.602×10⁻¹⁹) ≈ 96485 C (ثابت فاراداي)', en: 'Q = N_A × e = (6.022×10²³)(1.602×10⁻¹⁹) ≈ 96485 C (Faraday constant)' }
+                }
+            ]
+        }
+    ]
+};
+
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function prepareShuffledExam() {
+    rng = mulberry32(currentSeed);
+    examData = JSON.parse(JSON.stringify(originalExamData));
+    correctAnswersMap = {};
+    let globalIdx = 0;
+    examData.sections.forEach((section) => {
+        section.questions = shuffleArray(section.questions);
+        section.questions.forEach((q) => {
+            const optionsWithCorrect = q.options.map((opt, idx) => ({ option: opt, isCorrect: idx === q.correct }));
+            const shuffledOptions = shuffleArray(optionsWithCorrect);
+            q.options = shuffledOptions.map(o => o.option);
+            q.correct = shuffledOptions.findIndex(o => o.isCorrect);
+            correctAnswersMap[globalIdx] = String.fromCharCode(97 + q.correct);
+            globalIdx++;
+        });
+    });
+}
+
+function reshuffleExam() {
+    const msg = currentLang === 'ar' ? ' سيتم إنشاء أسئلة جديدة ومسح إجاباتك. هل أنت متأكد؟' : '🔄 New questions will be generated. Are you sure?';
+    if (confirm(msg)) {
+        currentSeed = Date.now(); timeRemaining = TOTAL_TIME; answersVisible = false;
+        prepareShuffledExam(); renderExam(); saveState();
+        alert(currentLang === 'ar' ? '🎲 تم تغيير الأسئلة! حظاً موفقاً! 🍀' : ' Questions changed! Good luck! 🍀');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.body.classList.toggle('en-mode', lang === 'en');
+    renderExam(); saveState(false);
+}
+
+function renderExam() {
+    const container = document.getElementById('exam-content');
+    const labels = { ar: { option: ['أ', 'ب', 'ج', 'د'], answer: '✅ الإجابة:' }, en: { option: ['A', 'B', 'C', 'D'], answer: '✅ Answer:' } };
+    const lbl = labels[currentLang];
+    let html = '';
+    let globalIdx = 0;
+    
+    examData.sections.forEach((section, secIdx) => {
+        const badgeClass = ['module-1', 'module-2', 'module-3', 'module-4', 'module-5', 'module-6'][secIdx];
+        html += '<section class="bg-white p-6 rounded-2xl shadow-lg border-2 border-purple-100">';
+        html += '<div class="text-center mb-4"><span class="module-badge ' + badgeClass + '">' + section.title[currentLang] + '</span></div>';
+        html += '<ol class="space-y-4 text-sm">';
+        
+        section.questions.forEach((q) => {
+            html += '<li class="border-r-4 border-purple-400 pr-4 py-2" id="q-' + globalIdx + '">';
+            html += '<strong class="text-purple-700">' + (globalIdx + 1) + '.</strong> <span class="arabic-math">' + q.q[currentLang] + '</span><br>';
+            if (q.svg) html += '<div class="graph-container">' + q.svg + '</div>';
+            
+            q.options.forEach((opt, oIdx) => {
+                html += '<label class="cursor-pointer block mt-2 mr-4 hover:bg-purple-50 rounded-lg p-2 transition">';
+                html += '<input type="radio" name="q' + globalIdx + '" value="' + String.fromCharCode(97 + oIdx) + '" class="mr-2 ml-2">';
+                html += '<span class="arabic-math">' + lbl.option[oIdx] + ') ' + opt[currentLang] + '</span>';
+                html += '</label>';
+            });
+            
+            html += '<div class="answer-box text-green-700 mt-3 font-medium ' + (answersVisible ? '' : 'hidden') + ' bg-green-50 rounded-lg p-3 border border-green-200">';
+            html += lbl.answer + ' ' + lbl.option[q.correct] + ') <span class="arabic-math">' + q.options[q.correct][currentLang] + '</span><br>';
+            html += '<span class="text-sm text-green-700 mt-2 block arabic-math">' + q.answer[currentLang] + '</span>';
+            html += '</div></li>';
+            globalIdx++;
+        });
+        
+        html += '</ol></section>';
+    });
+    
+    container.innerHTML = html;
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining % 60 === 0) saveState(false);
+        if (timeRemaining <= 600) document.getElementById('timer').classList.add('timer-warning');
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert("⏰ انتهى الوقت!");
+            gradeExam();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeRemaining / 60);
+    const s = timeRemaining % 60;
+    document.getElementById('timer').textContent = m.toString().padStart(2,'0') + ':' + s.toString().padStart(2,'0');
+}
+
+function toggleAnswers() {
+    answersVisible = !answersVisible;
+    document.querySelectorAll('.answer-box').forEach(el => el.classList.toggle('hidden', !answersVisible));
+    saveState(false);
+}
+
+function gradeExam() {
+    let correctCount = 0;
+    const sectionScores = new Array(TOTAL_SECTIONS).fill(0);
+    
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const sel = document.querySelector('input[name="q'+i+'"]:checked');
+        const li = document.getElementById('q-' + i);
+        if (li) {
+            const isCorrect = sel && sel.value === correctAnswersMap[i];
+            if (isCorrect) {
+                correctCount++;
+                li.classList.add('correct');
+                li.classList.remove('incorrect');
+                sectionScores[Math.floor(i / QUESTIONS_PER_SECTION)]++;
+            } else {
+                li.classList.add('incorrect');
+                li.classList.remove('correct');
+            }
+        }
+    }
+    
+    const score = Math.round((correctCount / TOTAL_QUESTIONS) * 100);
+    document.getElementById('res-total').textContent = score + ' / 100';
+    document.getElementById('res-name').textContent = document.getElementById('studentName').value || 'بطل';
+    document.getElementById('res-date').textContent = new Date().toLocaleDateString('ar-AE');
+    
+    const pc = document.getElementById('sections-performance');
+    pc.innerHTML = '';
+    examData.sections.forEach((s, idx) => {
+        pc.innerHTML += '<div class="flex justify-between items-center p-3 bg-white rounded-lg"><span class="text-gray-700">' + s.title[currentLang] + '</span><span class="font-bold text-purple-700">' + sectionScores[idx] + '/' + QUESTIONS_PER_SECTION + '</span></div>';
+    });
+    
+    const badge = document.getElementById('success-badge');
+    document.getElementById('success-percent').textContent = score + '%';
+    
+    if (currentLang === 'ar') {
+        if (score >= 90) { badge.textContent = '🌟 ممتاز جداً!'; badge.className = 'success-badge grade-excellent'; }
+        else if (score >= 75) { badge.textContent = '👏 ممتاز!'; badge.className = 'success-badge grade-good'; }
+        else if (score >= 50) { badge.textContent = '👍 جيد'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = '💪 حاول مرة أخرى'; badge.className = 'success-badge grade-fail'; }
+    } else {
+        if (score >= 90) { badge.textContent = '🌟 Outstanding!'; badge.className = 'success-badge grade-excellent'; }
+        else if (score >= 75) { badge.textContent = '👏 Excellent!'; badge.className = 'success-badge grade-good'; }
+        else if (score >= 50) { badge.textContent = '👍 Good'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = '💪 Try Again'; badge.className = 'success-badge grade-fail'; }
+    }
+    
+    document.getElementById('results-panel').classList.remove('hidden');
+    document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
+    if (timerInterval) clearInterval(timerInterval);
+}
+
+function sendResultsToEmail() {
+    const btn = document.getElementById('sendEmailBtn');
+    const status = document.getElementById('emailStatus');
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري الإرسال...';
+    
+    const name = document.getElementById('studentName').value || 'غير محدد';
+    const studentClass = document.getElementById('studentClass').value || 'غير محدد';
+    const date = document.getElementById('examDate').value || new Date().toLocaleDateString();
+    const score = document.getElementById('res-total').textContent;
+    const successRate = document.getElementById('success-percent').textContent;
+    const badge = document.getElementById('success-badge').textContent;
+    
+    let questionsHTML = '<table style="width:100%; border-collapse: collapse; font-family: Arial; font-size: 12px; direction: rtl;">';
+    questionsHTML += '<thead><tr style="background:#7c3aed; color:white;"><th style="padding:8px; border:1px solid #ddd;">#</th><th style="padding:8px; border:1px solid #ddd;">السؤال</th><th style="padding:8px; border:1px solid #ddd;">إجابة الطالب</th><th style="padding:8px; border:1px solid #ddd;">الصحيحة</th><th style="padding:8px; border:1px solid #ddd;">النتيجة</th></tr></thead><tbody>';
+    
+    let globalIdx = 0;
+    examData.sections.forEach((section) => {
+        questionsHTML += '<tr style="background:#fef3c7;"><td colspan="5" style="padding:8px; font-weight:bold; border:1px solid #ddd;">' + section.title.ar + '</td></tr>';
+        section.questions.forEach((q) => {
+            const sel = document.querySelector('input[name="q'+globalIdx+'"]:checked');
+            const sv = sel ? sel.value : null;
+            const cv = correctAnswersMap[globalIdx];
+            const ic = sv === cv;
+            let sat = '❌ لم يجب';
+            let sac = '#dc2626';
+            if (sv) {
+                const si = sv.charCodeAt(0) - 97;
+                sat = q.options[si].ar;
+                sac = ic ? '#16a34a' : '#dc2626';
+            }
+            const cat = q.options[q.correct].ar;
+            const rb = ic ? '#f0fdf4' : '#fef2f2';
+            questionsHTML += '<tr style="background:' + rb + ';"><td style="padding:8px; border:1px solid #ddd; text-align:center;">' + (globalIdx+1) + '</td><td style="padding:8px; border:1px solid #ddd;">' + q.q.ar + '</td><td style="padding:8px; border:1px solid #ddd; color:' + sac + ';">' + sat + '</td><td style="padding:8px; border:1px solid #ddd; color:#16a34a;">' + cat + '</td><td style="padding:8px; border:1px solid #ddd; text-align:center;">' + (ic?'✅':'❌') + '</td></tr>';
+            globalIdx++;
+        });
+    });
+    questionsHTML += '</tbody></table>';
+    
+    const templateParams = {
+        to_email: TARGET_EMAIL,
+        student_name: name,
+        student_class: studentClass,
+        exam_date: date,
+        total_score: score,
+        success_rate: successRate,
+        grade: badge,
+        answers_table: questionsHTML
+    };
+    
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+        .then(() => {
+            status.textContent = '✅ تم الإرسال بنجاح!';
+            status.style.color = '#16a34a';
+            btn.textContent = '✓ تم';
+            alert('تم إرسال النتيجة للمعلم بنجاح!');
+        })
+        .catch((error) => {
+            status.textContent = '❌ فشل الإرسال';
+            status.style.color = '#dc2626';
+            btn.disabled = false;
+            btn.textContent = '📧 حاول مرة أخرى';
+            alert('فشل الإرسال: ' + error.text);
+        });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = loadState();
+    if (saved && saved.seed) {
+        currentSeed = saved.seed;
+        currentLang = saved.lang || 'ar';
+        timeRemaining = saved.timeRemaining !== undefined ? saved.timeRemaining : TOTAL_TIME;
+        answersVisible = saved.answersVisible || false;
+        document.getElementById('btn-ar').classList.toggle('active', currentLang === 'ar');
+        document.getElementById('btn-en').classList.toggle('active', currentLang === 'en');
+        document.body.classList.toggle('en-mode', currentLang === 'en');
+    } else {
+        currentSeed = Date.now();
+    }
+    prepareShuffledExam();
+    renderExam();
+    if (saved) {
+        if (saved.studentName) document.getElementById('studentName').value = saved.studentName;
+        if (saved.studentClass) document.getElementById('studentClass').value = saved.studentClass;
+        if (saved.examDate) document.getElementById('examDate').value = saved.examDate;
+        if (saved.answers) restoreAnswers(saved.answers);
+    }
+    setupAnswerListeners();
+    setupInputListeners();
+    startTimer();
+});
+window.addEventListener('beforeunload', () => saveState(false));
+</script>
+</body>
+</html>
